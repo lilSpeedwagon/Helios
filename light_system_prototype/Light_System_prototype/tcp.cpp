@@ -1,5 +1,8 @@
 #include "tcp.h"
 
+//статический член класса, согласно стандарту, должен быть определен где то вне класса
+TCP* TCP::tcp_p;
+
 /* Конструктор класса сервера */
 TCP::TCP()  {
     qDebug() << "initializing TCP...";
@@ -11,16 +14,17 @@ TCP::TCP()  {
         return;
     }   else    {
         qDebug() << "Server is ready";
+        qDebug() << "-----------------------------";
         TCP::connect(serv, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
         //devices = new QMap<QString, Device>();
     }
 }
 
 /* Экземпляр TCP сервера получаем через геттер, т.к. данный класс реализует шаблон Singleton */
-TCP& TCP::getTCP()    {
-    if (!tcp)
-        tcp = new TCP();
-    return *tcp;
+TCP* TCP::getTCP()    {
+    if (!tcp_p)
+        tcp_p = new TCP();
+    return tcp_p;
 }
 
 /* Можем получить внутренний класс сервера на всякий случай */

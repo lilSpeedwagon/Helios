@@ -1,5 +1,8 @@
 #include "devices.h"
 
+//статический член класса, согласно стандарту, должен быть определен где то вне класса
+QMap<QString, Device>* Devices::devices;
+
 Devices::Devices()
 {
 

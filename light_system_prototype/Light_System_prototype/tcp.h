@@ -24,7 +24,7 @@ class TCP : QObject
 {
     Q_OBJECT
 private:
-    static TCP *tcp;
+    static TCP *tcp_p;
     TCP();
     TCP(TCP const&);
     TCP operator=(TCP const&);
@@ -40,7 +40,7 @@ private:
     void send(QTcpSocket *socket, QString message) const;
 
 public:
-    static TCP &getTCP();
+    static TCP *getTCP();
     QTcpServer *getServer() const;
     //QMap<QString, Device> *getDevices() const;
     //void setDevices(QMap<QString, Device> *devices);

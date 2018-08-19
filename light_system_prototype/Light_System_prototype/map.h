@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QDebug>
+#include <QFile>
 #include "device.h"
 #include "devices.h"
 #include "point.h"
@@ -20,6 +21,7 @@ private:
     void operator=(Map const&);
     float width;
     float height;
+    QFile *mapFile;
     void readMap();
 public:
     static Map& getMap();
