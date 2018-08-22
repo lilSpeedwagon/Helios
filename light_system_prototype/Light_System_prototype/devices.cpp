@@ -16,3 +16,11 @@ QMap<QString, Device>* Devices::getDevices()    {
     }
     return devices;
 }
+
+void Devices::add(QString name, Device device)  {
+    devices->insert(name, device);
+}
+
+void Devices::remove(QString name)   {
+    devices->remove(name);
+}

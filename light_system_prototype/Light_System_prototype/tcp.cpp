@@ -116,7 +116,7 @@ void TCP::slotDisconnected()    {
     QTcpSocket* pClientSocket = (QTcpSocket*)sender();
     foreach (Device device, *Devices::getDevices())  {
         if (device.getSocket() == pClientSocket)    {
-            Devices::getDevices()->remove(device.getName());
+            Devices::remove(device.getName());
             qDebug() << "device " + device.getName() + " removed from devices list";
         }
     }
@@ -161,7 +161,7 @@ void TCP::slotReadClient()
                 Devices::getDevices()->take(name).setPowerState(state);
             }   else    {
                 qDebug() << "new device detected. name: " + name + ", state: " + state;
-                Devices::getDevices()->insert(name, Device(pClientSocket, name, state));
+                Devices::add(name, Device(pClientSocket, name, state));
             }
         }   else    {
             qDebug() << "incorrect message format";

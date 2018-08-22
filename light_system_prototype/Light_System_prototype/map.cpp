@@ -44,7 +44,7 @@ void Map::readMap() {
                 float y = tempStr.section("\'", 5, 5).toFloat();
                 qDebug() << "Light object with name = " << tempName << ", x = " << x << ", y = " << y << " found";
                 Device tempDevice(tempName, Point(x, y));
-                Devices::getDevices()->insert(tempName, tempDevice);
+                Devices::add(tempName, tempDevice);
             }
             //здесь должно быть так же определение lock и геометрии карты
         }

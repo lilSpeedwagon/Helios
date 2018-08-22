@@ -7,7 +7,6 @@ Widget::Widget(QWidget *parent)
     mainLayout = new QHBoxLayout();
     lightTable = new QTableView();
     lightTable->
-    lightList = new
     personList = new QWidget();
     mapWidget = new QWidget();
     setLayout(mainLayout);
