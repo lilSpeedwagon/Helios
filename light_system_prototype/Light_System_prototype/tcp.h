@@ -34,7 +34,6 @@ private:
 
     QTcpServer* server;
     QTimer *timer;
-    //QMap<QString, Device> *devices;
 
     void initTimer();
     void send(QTcpSocket *socket, QString message) const;
@@ -42,8 +41,6 @@ private:
 public:
     static TCP *getTCP();
     QTcpServer *getServer() const;
-    //QMap<QString, Device> *getDevices() const;
-    //void setDevices(QMap<QString, Device> *devices);
     void sendToClient(Device device, QString message) const;
     void sendToAll(QString message) const;
     void askAll(bool value);
@@ -52,9 +49,9 @@ public:
 
 public slots:
     void slotNewConnection();
-    void slotReadClient();
-    void slotDisconnected();
-    void slotAskAll();
+    //void slotReadClient();
+    //void slotDisconnected();
+    //void slotAskAll();
 };
 
 #endif // TCP_H

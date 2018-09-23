@@ -1,6 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <QtMath>
 
 class Point
 {
@@ -16,6 +17,8 @@ public:
     float Y() const;
     float& X();
     float& Y();
+
+    static float distantion(Point a, Point b);
 };
 
 #endif // POINT_H

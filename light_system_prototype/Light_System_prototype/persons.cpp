@@ -1,14 +1,16 @@
 #include "persons.h"
 
-Persons::Persons()
-{
+//статический член класса, согласно стандарту, должен быть определен где то вне класса
+QMap<QString, Person>* Persons::persons_ptr;
 
-}
-
-QMap<QString, Person>& Persons::getPersons()  {
-    if (!persons_ptr)
+QMap<QString, Person>* Persons::getPersons()  {
+    if (!persons_ptr)   {
+        qDebug() << "-----------------------------";
+        qDebug() << "persons initializing...";
         persons_ptr = new QMap<QString, Person>;
-    return *persons_ptr;
+        qDebug() << "Done";
+    }
+    return persons_ptr;
 }
 
 void Persons::add(QString name, Person person)    {

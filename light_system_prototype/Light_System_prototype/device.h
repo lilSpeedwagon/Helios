@@ -13,32 +13,24 @@ private:
     QString name;
     QString adress;
     PowerState powerState = PowerState::DISABLED;
-    QTcpSocket* socket;
 
-    Point position;
+    Point position = Point(0, 0);
 
 public:
-    static const QString MESSAGE_ON;
-    static const QString MESSAGE_OFF;
-    static const QString MESSAGE_ASK;
 
     Device();
     Device(QString name, Point position);
-    Device(QTcpSocket *socket);
-    Device(QTcpSocket *socket, QString name);
-    Device(QTcpSocket* socket, QString name, PowerState powerState);
-    Device(QTcpSocket* socket, QString name, int powerState);
+    Device(QString name, QString adress);
+    Device(QString name, QString adress, Point position);
     QString getName() const;
     QString getAdress() const;
     PowerState getPowerState() const;
-    QTcpSocket* getSocket() const;
     Point getPosition() const;
 
     void setName(QString name);
     void setAdress(QString adress);
     void setPowerState(PowerState powerState);
     void setPowerState(int powerState);
-    void setSocket(QTcpSocket *socket);
     void setPosition(Point position);
 };
 

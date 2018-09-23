@@ -3,6 +3,7 @@
 
 #include "person.h"
 #include "point.h"
+#include <QDebug>
 #include <QMap>
 #include <QString>
 
@@ -16,7 +17,7 @@ private:
     Persons(Persons const&);
     Persons& operator=(Persons const&);
 public:
-    static QMap<QString, Person>& getPersons();
+    static QMap<QString, Person> *getPersons();
     static void add(QString name, Person person);
     static void remove(QString name);
     static void setPosition(QString name, Point point);

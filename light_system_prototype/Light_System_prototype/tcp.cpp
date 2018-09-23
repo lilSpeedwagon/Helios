@@ -5,16 +5,14 @@ TCP* TCP::tcp_p;
 
 /* Конструктор класса сервера */
 TCP::TCP()  {
+    qDebug() << "-----------------------------";
     qDebug() << "initializing TCP...";
-
     QTcpServer *serv = new QTcpServer();
     if (!serv->listen(QHostAddress::Any, port)) {
-        qDebug() << "Server Error. Unable to start the server" + serv->errorString();
+        qCritical() << "Server Error. Unable to start the server" + serv->errorString();
         serv->close();
-        return;
     }   else    {
         qDebug() << "Server is ready";
-        qDebug() << "-----------------------------";
         TCP::connect(serv, SIGNAL(newConnection()), this, SLOT(slotNewConnection()));
         //devices = new QMap<QString, Device>();
     }
@@ -32,38 +30,34 @@ QTcpServer* TCP::getServer() const   {
     return server;
 }
 
-/* Получение списка устройств и их статуса внешними объектами */
-/*QMap<QString, Device>* TCP::getDevices() const {
-    return devices;
-}*/
-
-/*void TCP::setDevices(QMap<QString, Device> *devices)    {
-    this->devices = devices;
-}*/
-
 /* Метод для оптравки message на устройство device */
-void TCP::sendToClient(Device device, QString message) const {
+/*void TCP::sendToClient(Device device, QString message) const {
     qDebug() << "sending " + message + " to " + device.getName() + "...";
     QTcpSocket *socket = device.getSocket();
     send(socket, message);
-}
+}*/
 
 /* Отправляет message на все устройства из списка подключенных devices */
-void TCP::sendToAll(QString message) const  {
+/*void TCP::sendToAll(QString message) const  {
     qDebug() << "sending " + message + " to all...";
     foreach (Device device, *Devices::getDevices())  {
         send(device.getSocket(), message);
     }
-}
+}*/
 
 /* private метод для отправки сообщения на непосредственно socket */
 void TCP::send(QTcpSocket *socket, QString message) const  {
-    QByteArray  arrBlock;
-    QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    out << quint16(0) << message;
-    out.device()->seek(0);
-    out << quint16(arrBlock.size() - sizeof(quint16));
-    socket->write(arrBlock);
+    if (socket != nullptr)  {
+        QByteArray  arrBlock;
+        QDataStream out(&arrBlock, QIODevice::WriteOnly);
+        out << quint16(0) << message;
+        out.device()->seek(0);
+        out << quint16(arrBlock.size() - sizeof(quint16));
+        socket->write(arrBlock);
+    }   else    {
+        qWarning() << "Sending error. Device socket isn't initialized.";
+    }
+
 }
 
 /* приватный метод для инициализации таймера */
@@ -90,7 +84,7 @@ void TCP::askAll(bool value)  {
 
 /* сеттер частоты опроса */
 void TCP::setFrequency(float value)   {
-    qDebug() << "asking frequency has benn changed to " + QString::number(frequency);
+    qDebug() << "asking frequency has been changed to " + QString::number(frequency);
     frequency = value;
     if (timer != nullptr)
         timer->setInterval((int) 1000 / frequency);
@@ -111,7 +105,7 @@ void TCP::slotNewConnection()   {
 
 /* При отключении устройства будет вызван данный обработчик. Функция определяет какое устройство было отключено и
  * удаляет его из списка устройств, а так же выдает соответствующее сообщение */
-void TCP::slotDisconnected()    {
+/*void TCP::slotDisconnected()    {
     qDebug() << "device disconnected";
     QTcpSocket* pClientSocket = (QTcpSocket*)sender();
     foreach (Device device, *Devices::getDevices())  {
@@ -120,12 +114,12 @@ void TCP::slotDisconnected()    {
             qDebug() << "device " + device.getName() + " removed from devices list";
         }
     }
-}
+}*/
 
 /* Обработчик получения данных от устройств. Определяет корректность полученных данных и, если они корректны, то
  * определяет есть ли данное устройство в списке подключенных. Если такое уже подключено, то просто меняет его состояние.
  * Если нет, то так же добавляет его в список.*/
-void TCP::slotReadClient()
+/*void TCP::slotReadClient()
 {
     qDebug() << "incoming message";
     QTcpSocket* pClientSocket = (QTcpSocket*)sender();
@@ -164,13 +158,13 @@ void TCP::slotReadClient()
                 Devices::add(name, Device(pClientSocket, name, state));
             }
         }   else    {
-            qDebug() << "incorrect message format";
+            qWarning() << "incorrect message format";
         }
     }
-}
+}*/
 
 /* слот, вызываемый таймером timer с частотой frequency, и опрашивающий (отправляющий Device::MESSAGE_ASK)
  *  все устройства */
-void TCP::slotAskAll()  {
+/*void TCP::slotAskAll()  {
     sendToAll(Device::MESSAGE_ASK);
-}
+}*/

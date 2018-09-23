@@ -31,7 +31,8 @@ SOURCES += \
     point.cpp \
     map.cpp \
     devices.cpp \
-    persons.cpp
+    persons.cpp \
+    client.cpp
 
 HEADERS += \
         widget.h \
@@ -41,7 +42,8 @@ HEADERS += \
     point.h \
     map.h \
     devices.h \
-    persons.h
+    persons.h \
+    client.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -33,3 +33,6 @@ float Point::Y() const  {
     return y;
 }
 
+float Point::distantion(Point a, Point b)   {
+    return qSqrt(qPow(a.X() - b.X(), 2) + qPow(a.Y() - b.Y(), 2));
+}

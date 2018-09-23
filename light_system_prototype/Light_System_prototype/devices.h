@@ -18,6 +18,9 @@ public:
     static QMap<QString, Device> * getDevices();
     static void add(QString name, Device device);
     static void remove(QString name);
+signals:
+    static void signalNewDevice();
+    static void signalRemoveDevice();
 };
 
 /* отдельные статические методы по сути просто являются оболочкой над обычными insert и remove для коллекций, но дополнительно вырабатывают сигналы для работы с GUI */

@@ -5,6 +5,7 @@ Map* Map::map;
 
 Map::Map()
 {
+    qDebug() << "-----------------------------";
     qDebug() << "Map init...";
     readMap();
 }
@@ -50,9 +51,57 @@ void Map::readMap() {
         }
         qDebug() << "Done. Map file has been successfuly red.";
     }   else    {
-        qDebug() << "map file not found or it's incorrect :(";
-        qDebug() << "Aborting programm.";
+        qCritical() << "map file not found or it's incorrect :(";
+        qCritical() << "Aborting programm.";
         exit(1);
     }
-    qDebug() << "------------------------------------";
+}
+
+const float Map::triggerDistation = 100;
+
+void Map::checkPositions() {
+    qDebug() << "checking positions of all persons...";
+    for (auto &device : *Devices::getDevices())  {
+        for (auto &person : *Persons::getPersons()) {
+            if (Point::distantion(device.getPosition(), person.getPosition()) <= triggerDistation)    {
+                if (device.getPowerState() == PowerState::DISABLED) {
+                    qDebug() << person.getName() << " is entering to device " << device.getName() << " zone. Enabling device...";
+                    //TCP::getTCP()->sendToClient(device, Device::MESSAGE_ON);
+                    Client::getClient().sendToDevice(device, Client::MESSAGE_ON);
+                }
+            }   else    {
+                if (device.getPowerState() == PowerState::ENABLED)  {
+                    qDebug() << person.getName() << " is leaving device " << device.getName() << " zone. Disabling device...";
+                    //TCP::getTCP()->sendToClient(device, Client::MESSAGE_OFF);
+                    Client::getClient().sendToDevice(device, Client::MESSAGE_OFF);
+                }
+            }
+        }
+    }
+    qDebug() << "Done.";
+}
+
+void Map::initTimer()   {
+    qDebug() << "initializing map timer...";
+    timer = new QTimer();
+    timer->setInterval((int) 1000 / frequency);
+    connect(timer, SIGNAL(timeout()), this, SLOT(slotCheckPositions));
+    qDebug() << "Done";
+}
+
+void Map::checkPositions(bool value)    {
+    if (timer == nullptr)  {
+        initTimer();
+    }
+    if (value)  {
+        qDebug() << "starting checking map every " << int(1000 / frequency) << " seconds...";
+        timer->start();
+    }   else    {
+        qDebug() << "Stopping checking map...";
+        timer->stop();
+    }
+}
+
+void Map::slotCheckPositions()  {
+    checkPositions();
 }
