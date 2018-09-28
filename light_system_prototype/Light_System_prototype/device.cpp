@@ -20,6 +20,13 @@ PowerState Device::getPowerState() const  {
     return powerState;
 }
 
+QString Device::getPowerStateStr() const    {
+    if (powerState == PowerState::ENABLED)
+        return "Enabled";
+    else
+        return "Disabled";
+}
+
 Point Device::getPosition() const   {
     return position;
 }

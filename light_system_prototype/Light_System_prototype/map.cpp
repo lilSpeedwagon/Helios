@@ -33,7 +33,7 @@ void Map::setHeight(float height)   {
 }
 
 void Map::readMap() {
-    mapFile = new QFile("C:\\docs\\programms\\Future Gadgets LAb\\Smart_district\\Helios\\light_system_prototype\\smartDistrict.map");
+    mapFile = new QFile("C:\\docs\\programms\\Future Gadgets LAb\\Smart_district\\Helios\\light_system_prototype\\smartDistrict.lmap");
     if (mapFile->exists() && mapFile->open(QIODevice::ReadOnly))   {
         qDebug() << "map file has opened.";
         qDebug() << "Reading...";
@@ -49,6 +49,7 @@ void Map::readMap() {
             }
             //здесь должно быть так же определение lock и геометрии карты
         }
+        mapFile->close();
         qDebug() << "Done. Map file has been successfuly red.";
     }   else    {
         qCritical() << "map file not found or it's incorrect :(";
@@ -57,23 +58,23 @@ void Map::readMap() {
     }
 }
 
-const float Map::triggerDistation = 100;
+const float Map::TRIGGER_DISTANTION = 100;
 
 void Map::checkPositions() {
     qDebug() << "checking positions of all persons...";
     for (auto &device : *Devices::getDevices())  {
         for (auto &person : *Persons::getPersons()) {
-            if (Point::distantion(device.getPosition(), person.getPosition()) <= triggerDistation)    {
+            if (Point::distantion(device.getPosition(), person.getPosition()) <= TRIGGER_DISTANTION)    {
                 if (device.getPowerState() == PowerState::DISABLED) {
                     qDebug() << person.getName() << " is entering to device " << device.getName() << " zone. Enabling device...";
                     //TCP::getTCP()->sendToClient(device, Device::MESSAGE_ON);
-                    Client::getClient().sendToDevice(device, Client::MESSAGE_ON);
+                    client->sendToDevice(device, Client::MESSAGE_ON);
                 }
             }   else    {
                 if (device.getPowerState() == PowerState::ENABLED)  {
                     qDebug() << person.getName() << " is leaving device " << device.getName() << " zone. Disabling device...";
                     //TCP::getTCP()->sendToClient(device, Client::MESSAGE_OFF);
-                    Client::getClient().sendToDevice(device, Client::MESSAGE_OFF);
+                    client->sendToDevice(device, Client::MESSAGE_OFF);
                 }
             }
         }
@@ -87,6 +88,15 @@ void Map::initTimer()   {
     timer->setInterval((int) 1000 / frequency);
     connect(timer, SIGNAL(timeout()), this, SLOT(slotCheckPositions));
     qDebug() << "Done";
+}
+
+void Map::destroyTimer()    {
+    qDebug() << "destroying map timer...";
+
+    timer->stop();
+    delete timer;
+
+    qDebug() << "Done.";
 }
 
 void Map::checkPositions(bool value)    {
@@ -104,4 +114,8 @@ void Map::checkPositions(bool value)    {
 
 void Map::slotCheckPositions()  {
     checkPositions();
+}
+
+void Map::setSender(Client *client) {
+    this->client = client;
 }

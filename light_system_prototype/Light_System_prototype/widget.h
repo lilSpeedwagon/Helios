@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QTableWidget>
+#include <QTimer>
 
 class Widget : public QWidget
 {
@@ -24,18 +25,25 @@ class Widget : public QWidget
 private:
     const int ROW_HEIGHT = 30;
     const int COLUMN_WIDTH = 100;
+    const float REFRESH_FREQ = 1;
 
     QHBoxLayout* mainLayout;
     QWidget* deviceList;
     QWidget* personList;
     QWidget* mapWidget;
     QTableWidget* lightTable;
+    QLabel* stateLabel;
+    QTimer* timer;
+
+    void initTimer();
+    void destroyTimer();
 public:
     Widget(QWidget *parent = 0);
     ~Widget();
 
 public slots:
     void slotNewDevice(Device const& device);
+    void slotRefreshDevicesData();
 };
 
 #endif // WIDGET_H

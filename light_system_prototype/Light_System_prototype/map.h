@@ -20,19 +20,25 @@
 class Map : QObject
 {
 private:
+    float width;
+    float height;
+    float  frequency = 1;
+    static const float TRIGGER_DISTANTION;    //дистанция реакции устройств
+
     static Map *map;
     Map();
     Map(Map const&);
     void operator=(Map const&);
-    float width;
-    float height;
+
     QFile *mapFile;
-    void readMap();
-    void checkPositions();
     QTimer *timer;
+    Client *client;
+
+    void readMap();
     void initTimer();
-    float  frequency = 1;
-    static const float triggerDistation;    //дистанция реакции устройств
+    void destroyTimer();
+    void checkPositions();
+
 public:
     static Map& getMap();
     float getWidth() const;
@@ -40,6 +46,7 @@ public:
     void setWidth(float width);
     void setHeight(float height);
     void checkPositions(bool value);
+    void setSender(Client *client);
 
 public slots:
     void slotCheckPositions();

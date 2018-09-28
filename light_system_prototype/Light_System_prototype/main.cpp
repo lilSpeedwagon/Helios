@@ -8,29 +8,38 @@
 //#include "tcp.h"
 #include "client.h"
 #include "map.h"
+#include "coder.h"
 
 #include <QNetworkConfigurationManager>
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "-----------------------------";
     qDebug() << "Initializing application...";
     QApplication a(argc, argv);
 
     Widget w;
+    w.moveToThread(new QThread());
     w.show();
+
 
     Devices::getDevices();
     Persons::getPersons();
 
     Map::getMap();
 
-    //TCP::getTCP();
-    Client::getClient();
-
-    Client::getClient().sendToDevice(Devices::getDevices()->take("L12"), Client::MESSAGE_ON);
-
+    Client *client = new Client();
+    client->callDevices();
 
     qDebug() << "Application has been initialized.";
+    qDebug() << "-----------------------------";
+
+    /* QString str = "Hi. My name is Connor. I'm an android sent by CyberLife.";
+    qDebug() << str;
+    str = Coder::encode(str);
+    qDebug() << str;
+    str = Coder::decode(str);
+    qDebug() << str; */
 
     return a.exec();
 }

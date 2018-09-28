@@ -25,6 +25,7 @@ public:
     QString getName() const;
     QString getAdress() const;
     PowerState getPowerState() const;
+    QString getPowerStateStr() const;
     Point getPosition() const;
 
     void setName(QString name);
