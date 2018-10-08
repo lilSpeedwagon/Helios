@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QTimer>
-//#include "tcp.h"
 #include "client.h"
 #include "device.h"
 #include "devices.h"
@@ -32,9 +31,9 @@ private:
 
     QFile *mapFile;
     QTimer *timer;
-    Client *client;
+    static Client *client;
+    static Devices *devices;
 
-    void readMap();
     void initTimer();
     void destroyTimer();
     void checkPositions();
@@ -46,7 +45,10 @@ public:
     void setWidth(float width);
     void setHeight(float height);
     void checkPositions(bool value);
-    void setSender(Client *client);
+    static void setSender(Client *client);
+    static void setDevices(Devices *devices);
+
+    void readMap(QString fileName);
 
 public slots:
     void slotCheckPositions();

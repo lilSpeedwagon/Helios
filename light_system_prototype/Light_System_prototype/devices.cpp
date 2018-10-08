@@ -1,16 +1,18 @@
 #include "devices.h"
 
-//статический член класса, согласно стандарту, должен быть определен где то вне класса
-QMap<QString, Device>* Devices::devices;
+Devices::Devices()  {
+    devices = new QMap<QString, Device>();
+}
 
-QMap<QString, Device>* Devices::getDevices()    {
-    if(!devices)    {
-        qDebug() << "-----------------------------";
-        qDebug() << "devices initializing...";
-        devices = new QMap<QString, Device>();
-        qDebug() << "Done";
-    }
-    return devices;
+Devices::Devices(Devices const& d)  {
+    devices = new QMap<QString, Device>(*d.devices);
+}
+
+Devices& Devices::operator=(Devices const& d)   {
+    if (devices != nullptr)
+        delete devices;
+    devices = new QMap<QString, Device>(*d.devices);
+    return *this;
 }
 
 void Devices::add(QString name, Device device)  {
@@ -21,4 +23,12 @@ void Devices::add(QString name, Device device)  {
 void Devices::remove(QString name)   {
     devices->remove(name);
     emit SIGNAL(signalRemoveDevice());
+}
+
+void Devices::clear()   {
+    devices->clear();
+}
+
+QMap<QString, Device>& Devices::getDevices() const  {
+    return *devices;
 }

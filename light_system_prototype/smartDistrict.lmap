@@ -1,2 +1,8 @@
-<light name='H0001' x='5' y='6.4'>
-<light name='H0002' x='10' y='10000'>
+<map>
+<light name='H0001' x='100' y='100'>
+<light name='H0002' x='200' y='100'>
+<light name='H0003' x='300' y='100'>
+<light name='H0004' x='400' y='100'>
+<light name='H0005' x='500' y='100'>
+<light name='H0006' x='600' y='100'>
+</map>

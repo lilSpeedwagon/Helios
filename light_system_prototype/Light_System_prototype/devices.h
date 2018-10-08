@@ -4,25 +4,22 @@
 #include <QMap>
 #include "device.h"
 
-/* Singleton класс для хранения массива устройств (существующих по факту) и обращения к ним из любого участка программы. */
-
 class Devices
 {
 private:
-    static QMap<QString, Device> *devices;
-    // Конструкторы и оператор присваивания недоступны клиентам
+    QMap<QString, Device> *devices;
+public:
     Devices();
     Devices(Devices const& );
     Devices& operator=(Devices const&);
-public:
-    static QMap<QString, Device> * getDevices();
-    static void add(QString name, Device device);
-    static void remove(QString name);
+    void add(QString name, Device device);
+    void remove(QString name);
+    void clear();
+    QMap<QString, Device>& getDevices() const;
 signals:
-    static void signalNewDevice();
-    static void signalRemoveDevice();
+    void signalNewDevice();
+    void signalRemoveDevice();
 };
 
-/* отдельные статические методы по сути просто являются оболочкой над обычными insert и remove для коллекций, но дополнительно вырабатывают сигналы для работы с GUI */
 
 #endif // DEVICES_H

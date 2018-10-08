@@ -1,0 +1,4 @@
+<map>
+<light name='test_light1' x='100' y='100'>
+<light name='test_light2' x='200' y='200'>
+</map>

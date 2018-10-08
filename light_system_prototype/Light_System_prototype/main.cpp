@@ -5,11 +5,12 @@
 #include "devices.h"
 #include "person.h"
 #include "persons.h"
-//#include "tcp.h"
 #include "client.h"
 #include "map.h"
-#include "coder.h"
+#include "requestmanager.h"
 
+#include <QHostAddress>
+#include <QNetworkInterface>
 #include <QNetworkConfigurationManager>
 
 int main(int argc, char *argv[])
@@ -19,27 +20,33 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Widget w;
-    w.moveToThread(new QThread());
     w.show();
 
-
-    Devices::getDevices();
+    Devices *devices = new Devices();
     Persons::getPersons();
 
+    Client *client = new Client(devices);
+
+    Map::setDevices(devices);
+    Map::setSender(client);
     Map::getMap();
 
-    Client *client = new Client();
-    client->callDevices();
+    w.setClient(client);
+    w.setDevices(devices);
+    //client->callDevicesInThread();
 
     qDebug() << "Application has been initialized.";
     qDebug() << "-----------------------------";
 
-    /* QString str = "Hi. My name is Connor. I'm an android sent by CyberLife.";
-    qDebug() << str;
-    str = Coder::encode(str);
-    qDebug() << str;
-    str = Coder::decode(str);
-    qDebug() << str; */
+    /*
+    qDebug() << "adress list:";
+    QList<QHostAddress> addressList = QNetworkInterface::allAddresses();
+        foreach( QHostAddress address, addressList )
+            qDebug( "yet another address: %s", qPrintable( address.toString() ) ); // выводим на экран
+    */
+
+    //RequestManager manager;
+    //manager.sendGETRequest("http://localhost/get_test/get_test.php", "?request=answer");
 
     return a.exec();
 }
