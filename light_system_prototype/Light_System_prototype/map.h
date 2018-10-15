@@ -18,6 +18,7 @@
 
 class Map : QObject
 {
+    Q_OBJECT
 private:
     float width;
     float height;
@@ -48,7 +49,7 @@ public:
     static void setSender(Client *client);
     static void setDevices(Devices *devices);
 
-    void readMap(QString fileName);
+    bool readMap(QString fileName);
 
 public slots:
     void slotCheckPositions();

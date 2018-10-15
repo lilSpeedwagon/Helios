@@ -15,20 +15,34 @@ Devices& Devices::operator=(Devices const& d)   {
     return *this;
 }
 
-void Devices::add(QString name, Device device)  {
+void Devices::add(QString name, Device const& device)  {
     devices->insert(name, device);
-    emit SIGNAL(signalNewDevice());
+    emit signalNewDevice();
 }
 
 void Devices::remove(QString name)   {
     devices->remove(name);
-    emit SIGNAL(signalRemoveDevice());
+    emit signalRemoveDevice();
 }
 
 void Devices::clear()   {
+    qDebug() << "Clearing device list...";
     devices->clear();
 }
 
+void Devices::clearAdresses()   {
+    for (Device &device : *devices)   {
+        if (!device.getAdress().isEmpty())
+            device.setAdress(0);
+    }
+}
 QMap<QString, Device>& Devices::getDevices() const  {
     return *devices;
 }
+
+int Devices::size() const   {
+    return devices->size();
+}
+
+void Devices::signalNewDevice() {}
+void Devices::signalRemoveDevice() {};

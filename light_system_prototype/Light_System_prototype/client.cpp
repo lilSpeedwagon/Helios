@@ -1,15 +1,21 @@
 #include "client.h"
 
-const QString Client::ADRESS_MASK_DEFAULT = "192.168.1.";
-const quint16 Client::PORT_DEFAULT = 8080;
+const QString Client::ADRESS_MASK_DEFAULT = "10.1.13";
+const quint16 Client::PORT_DEFAULT = 8888;
 
 const quint16 Client::DELAY_CONNECTION = 50;
-const quint16 Client::DELAY_READ_DATA = 500;
+const quint16 Client::DELAY_READ_DATA = 1000;
 
 const QString Client::MESSAGE_CALL = "HI";
 const QString Client::MESSAGE_ON = "ON";
 const QString Client::MESSAGE_OFF = "OFF";
 const QString Client::MESSAGE_ASK = "HOW";
+
+void Client::setSocket(QTcpSocket& socket)  {
+    connect(&socket, SIGNAL(connected()), this, SLOT(slotConnected()));
+    connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)));
+    connect(&socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+}
 
 Client::Client(Devices* devices)
 {
@@ -18,10 +24,7 @@ Client::Client(Devices* devices)
 
     this->devices = devices;
     socket = new QTcpSocket();
-
-    connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    setSocket(*socket);
 
     qDebug() << "Done.";
 }
@@ -31,20 +34,26 @@ void Client::callDevicesInThread()  {
 }
 
 void Client::callDevices() {
-    qDebug() << "Calling for devices...";
+    qDebug() << "Calling for devices on local adress " << adress << " and port " << port << "...";
 
     if (socket != nullptr)  {
         delete socket;
         socket = new QTcpSocket();
+        setSocket(*socket);
     }
 
     deviceNumber = 0;
     progress = 0;
     callingForDevices = true;
     for (int i = 0; i <= 255; i++)  {
-        progress = i;
-        currentAdress = adress + QString::number(i);
-        call(currentAdress, PORT_DEFAULT);
+        if (callingForDevices)   {
+            progress = i;
+            currentAdress = adress + QString::number(i);
+            call(currentAdress, PORT_DEFAULT);
+        }   else    {
+            progress = 0;
+        }
+
     }
 
     currentAdress.clear();
@@ -69,6 +78,10 @@ void Client::call(QString adress, quint16 port) {
     }    else    {
         qDebug() << "Connection error.";
     }
+}
+
+void Client::slotCancelCalling()    {
+    callingForDevices = false;
 }
 
 void Client::slotConnected()    {
@@ -99,6 +112,14 @@ void Client::slotReadyRead()    {
                 }
             }
         }
+
+        if (message == "DONE")  {
+            for (Device &device : devices->getDevices())    {
+                if (device.getAdress() == currentAdress)    {
+                    device.changeState();
+                }
+            }
+        }
     }   else    {
         qDebug() << "empty message.";
     }
@@ -106,8 +127,10 @@ void Client::slotReadyRead()    {
 
 void Client::send(QString message)  {
     qDebug() << "Sending " << message;
-    if (socket == nullptr)
+    if (socket == nullptr)  {
         socket = new QTcpSocket();
+        setSocket(*socket);
+    }
     if (socket->state() == QAbstractSocket::SocketState::ConnectedState)    {
         char *bytes = new char[message.length() + 2];
         bytes[0] = message.length();
@@ -123,13 +146,24 @@ void Client::send(QString message)  {
     }
 }
 
-void Client::sendToDevice(Device device, QString message)    {
-    sendToDevice(device.getAdress(), PORT_DEFAULT, message);
+bool Client::sendToDevice(QString deviceName, QString message)  {
+    if (devices->getDevices().contains(deviceName)) {
+        return sendToDevice(devices->getDevices().take(deviceName), message);
+    }   else    {
+        qDebug() << "no " << deviceName << " device found";
+        return false;
+    }
 }
 
-void Client::sendToDevice(QString adress, quint16 port, QString message)    {
-    if (socket == nullptr)
+bool Client::sendToDevice(Device device, QString message)    {
+    return sendToDevice(device.getAdress(), PORT_DEFAULT, message);
+}
+
+bool Client::sendToDevice(QString adress, quint16 port, QString message)    {
+    if (socket == nullptr)  {
         socket = new QTcpSocket();
+        setSocket(*socket);
+    }
     if (socket->state() == QAbstractSocket::SocketState::ConnectedState)    {
         socket->disconnectFromHost();
     }
@@ -137,12 +171,22 @@ void Client::sendToDevice(QString adress, quint16 port, QString message)    {
     socket->connectToHost(adress, port);
     if (socket->waitForConnected(DELAY_CONNECTION))
         send(message);
-    socket->disconnectFromHost();
-
+    else    {
+        qDebug() << "Connection error";
+        return false;
+    }
+    if (socket->waitForReadyRead(DELAY_READ_DATA))
+        socket->disconnectFromHost();
+    return true;
 }
 
 void Client::setAdress(QString const& adress)   {
     this->adress = adress;
+}
+
+void Client::setAdress(QString const& adress, quint16 const& port)  {
+    this->adress = adress;
+    this->port = port;
 }
 
 bool Client::isConnected() const {

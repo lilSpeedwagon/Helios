@@ -8,6 +8,10 @@ Device::Device(QString name, QString adress) : name(name), adress(adress)   {}
 
 Device::Device(QString name, QString adress, Point position) : name(name), adress(adress), position(position)   {}
 
+int Device::getId() const   {
+    return id;
+}
+
 QString Device::getName() const   {
     return name;
 }
@@ -31,6 +35,18 @@ Point Device::getPosition() const   {
     return position;
 }
 
+bool Device::isEnabled() const  {
+    return (powerState == PowerState::ENABLED);
+}
+
+bool Device::isConnected() const    {
+    return !adress.isEmpty();
+}
+
+void Device::setId(int id)  {
+    this->id = id;
+}
+
 void Device::setName(QString name)  {
     this->name = name;
 }
@@ -52,4 +68,16 @@ void Device::setPowerState(int powerState)  {
 
 void Device::setPosition(Point position)    {
     this->position = position;
+}
+
+void Device::changeState()  {
+    if (powerState == PowerState::ENABLED)  {
+        powerState = PowerState::DISABLED;
+    }   else    {
+        powerState = PowerState::ENABLED;
+    }
+}
+
+Device::~Device()   {
+
 }

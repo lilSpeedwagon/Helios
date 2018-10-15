@@ -6,6 +6,7 @@
 #include "point.h"
 #include "client.h"
 #include "map.h"
+#include "check.h"
 
 #include <QWidget>
 #include <QDebug>
@@ -21,35 +22,50 @@
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QFileDialog>
+#include <QMessageBox>
 
-enum Status { INIT, CALLING, READY };
+enum Status { INIT, CALLING, READY, MAP };
 
 class Widget : public QWidget
 {
     Q_OBJECT
 
 private:
-    const int MIN_WIDTH = 800;
+    const int MIN_WIDTH = 900;
     const int MIN_HEIGHT = 300;
     const int ROW_HEIGHT = 30;
     const int COLUMN_WIDTH = 100;
     const int ITEM_MARGIN = 10;
     const int MIN_OPTIONS_WIDTH = 200;
-    const float REFRESH_FREQ = 1;
+    const float REFRESH_FREQ = 5;
 
     void initLightTable();
     void initOptions();
+    void createButtons();
 
     QHBoxLayout* mainLayout;
+
+    QHBoxLayout* lightTableLayout;
     QTableWidget* lightTable;
+    QVBoxLayout* lightButtonLayout;
+    QMap<QString, QPushButton*> *lightButtons;
+
     QVBoxLayout* optionsLayout;
     QGroupBox* optionsBox;
+
     QLabel* networkAdressLabel;
     QLineEdit* networkAdressBox;
+
+    QLabel* networkPortLabel;
+    QLineEdit* networkPortBox;
+
+    QHBoxLayout* callLayout;
     QPushButton* callDevicesButton;
-    QLabel* statusBar;
+    QPushButton* cancelCallButton;
     QProgressBar* recallProgressBar;
     QPushButton* fileChooseButton;
+
+    QLabel* statusBar;
 
     Status status = Status::INIT;
     void setStatus(Status const& status);
@@ -61,18 +77,23 @@ private:
     Client* client;
     Devices* devices;
 
-    bool isCorrectAdress(QString const& adress);
 public:
     Widget(QWidget *parent = 0);
     void setClient(Client *client = nullptr);
     void setDevices(Devices *devices = nullptr);
-    ~Widget();
+    ~Widget() = default;
 
 public slots:
     void slotNewDevice(Device const& device);
     void slotRefreshDevicesData();
     void slotCallDevicesButton();
+    void slotCancelCallButton();
+    void slotEndCalling();
     void slotFileChooseButton();
+    void slotSwitchButton();
+
+signals:
+    void signalCancelCalling();
 };
 
 #endif // WIDGET_H

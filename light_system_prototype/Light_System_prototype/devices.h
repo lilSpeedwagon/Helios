@@ -12,10 +12,12 @@ public:
     Devices();
     Devices(Devices const& );
     Devices& operator=(Devices const&);
-    void add(QString name, Device device);
+    void add(QString name, Device const& device);
     void remove(QString name);
     void clear();
+    void clearAdresses();
     QMap<QString, Device>& getDevices() const;
+    int size() const;
 signals:
     void signalNewDevice();
     void signalRemoveDevice();

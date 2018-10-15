@@ -34,7 +34,9 @@ void Map::setHeight(float height)   {
     this->height = height;
 }
 
-void Map::readMap(QString fileName) {
+bool Map::readMap(QString fileName) {
+    bool result = false;
+
     mapFile = new QFile(fileName);
     if (mapFile->exists() && mapFile->open(QIODevice::ReadOnly))   {
         qDebug() << "map file has opened.";
@@ -51,14 +53,14 @@ void Map::readMap(QString fileName) {
                     float x = tempStr.section("\'", 3, 3).toFloat();
                     float y = tempStr.section("\'", 5, 5).toFloat();
                     qDebug() << "Light object with name = " << tempName << ", x = " << x << ", y = " << y << " found";
-                    Device tempDevice(tempName, Point(x, y));
-                    devices->add(tempName, tempDevice);
+
+                    devices->add(tempName, Device(tempName, Point(x, y)));
                 }
                 //здесь должно быть так же определение lock и геометрии карты
             }
+            result = true;
         }   else    {
-            qCritical() << "Incorrect map file :(";
-            return;
+            qCritical() << "Incorrect map file :(";            
         }
 
         mapFile->close();
@@ -67,6 +69,7 @@ void Map::readMap(QString fileName) {
     }   else    {
         qCritical() << "map file not found or it's incorrect :(";
     }
+    return result;
 }
 
 const float Map::TRIGGER_DISTANTION = 100;
