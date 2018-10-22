@@ -15,6 +15,8 @@ class Client : public QObject
 private:
     static const quint16 DELAY_CONNECTION;
     static const quint16 DELAY_READ_DATA;
+    static const int ADRESS_MIN;
+    static const int ADRESS_MAX;
 
     Devices* devices;
 
@@ -52,6 +54,7 @@ public:
     QString getCurrentAdress() const;
     QString getAdress() const;
     int getProgress() const;
+    QTcpSocket* getSocket() const;
 
     ~Client();
 

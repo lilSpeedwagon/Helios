@@ -1,8 +1,13 @@
 #include "client.h"
-
+//private
 const QString Client::ADRESS_MASK_DEFAULT = "10.1.13";
+//const QString Client::ADRESS_MASK_DEFAULT = "192.168.43";
 const quint16 Client::PORT_DEFAULT = 8888;
 
+const int Client::ADRESS_MIN = 80;
+const int Client::ADRESS_MAX = 150;
+
+//public
 const quint16 Client::DELAY_CONNECTION = 50;
 const quint16 Client::DELAY_READ_DATA = 1000;
 
@@ -45,7 +50,7 @@ void Client::callDevices() {
     deviceNumber = 0;
     progress = 0;
     callingForDevices = true;
-    for (int i = 0; i <= 255; i++)  {
+    for (int i = ADRESS_MIN; i <= ADRESS_MAX; i++)  {
         if (callingForDevices)   {
             progress = i;
             currentAdress = adress + QString::number(i);
@@ -93,7 +98,6 @@ void Client::slotError(QAbstractSocket::SocketError error)    {
 }
 
 void Client::slotReadyRead()    {
-    qDebug() << "incoming data:";
 
     if (socket->bytesAvailable())   {
         QByteArray bytes = socket->readAll();
@@ -101,7 +105,7 @@ void Client::slotReadyRead()    {
         QString message(bytes);
         if (message.endsWith("\r\n"))
             message.chop(2);
-        qDebug() << message;
+        qDebug() << "incoming data: " << message;
 
         if (callingForDevices)  {
             for (Device &device : devices->getDevices())   {
@@ -140,7 +144,7 @@ void Client::send(QString message)  {
         bytes[message.length() + 1] = '\0';
         socket->write(bytes);
 
-        qDebug() << "Done.";
+        qDebug() << "Successful sending.";
     }   else    {
         qDebug() << "Sending error. No current connections.";
     }
@@ -209,6 +213,12 @@ int Client::getProgress() const {
     return progress;
 }
 
+QTcpSocket* Client::getSocket() const    {
+    if (socket != nullptr)
+        return socket;
+    return 0;
+}
+
 Client::~Client()   {
     qDebug() << "Destroying client...";
     if (socket != nullptr)  {
@@ -218,3 +228,4 @@ Client::~Client()   {
         delete socket;
     }
 }
+

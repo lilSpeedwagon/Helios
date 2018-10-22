@@ -13,6 +13,7 @@
 #include <QLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QStatusBar>
@@ -41,13 +42,13 @@ private:
 
     void initLightTable();
     void initOptions();
-    void createButtons();
+    void createDeviceTable();
+    void clearLightLayout();
 
     QHBoxLayout* mainLayout;
 
-    QHBoxLayout* lightTableLayout;
-    QTableWidget* lightTable;
-    QVBoxLayout* lightButtonLayout;
+    QGroupBox* lightBox;
+    QGridLayout* lightLayout;
     QMap<QString, QPushButton*> *lightButtons;
 
     QVBoxLayout* optionsLayout;
@@ -84,7 +85,7 @@ public:
     ~Widget() = default;
 
 public slots:
-    void slotNewDevice(Device const& device);
+    //void slotNewDevice(Device const& device);
     void slotRefreshDevicesData();
     void slotCallDevicesButton();
     void slotCancelCallButton();

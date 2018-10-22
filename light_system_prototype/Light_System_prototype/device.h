@@ -13,7 +13,7 @@ private:
     int id = 0;
     QString name;
     QString adress;
-    PowerState powerState = PowerState::DISABLED;
+    PowerState powerState = PowerState::ENABLED;
 
     Point position = Point(0, 0);
 

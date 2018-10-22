@@ -5,4 +5,6 @@
 <light name='H0004' x='400' y='100'>
 <light name='H0005' x='500' y='100'>
 <light name='H0006' x='600' y='100'>
+<camera name='C0001' x='100' y='100' devices='H0001,H0002'>
+<camera name='C0002' x='200' y='200' devices='H0003,H0004,H0005,H0006'>
 </map>

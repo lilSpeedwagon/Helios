@@ -7,6 +7,7 @@ Widget::Widget(QWidget *parent)
     qDebug() << "window initializating...";
 
     resize(MIN_WIDTH, MIN_HEIGHT);
+    setMinimumSize(QSize(MIN_WIDTH, MIN_HEIGHT));
 
     mainLayout = new QHBoxLayout();
     mainLayout->setMargin(ITEM_MARGIN);
@@ -25,25 +26,26 @@ Widget::Widget(QWidget *parent)
 }
 
 void Widget::initLightTable()   {
-    lightTableLayout = new QHBoxLayout();
+    lightBox = new QGroupBox("Device list");
 
-    lightTable = new QTableWidget(1, 5, this);
-    lightTable->setItem(0, 0, new QTableWidgetItem("#"));
-    lightTable->setItem(0, 1, new QTableWidgetItem("Name"));
-    lightTable->setItem(0, 2, new QTableWidgetItem("Adress"));
-    lightTable->setItem(0, 3, new QTableWidgetItem("Position"));
-    lightTable->setItem(0, 4, new QTableWidgetItem("State"));
-    lightTable->setRowHeight(0, ROW_HEIGHT);
-    lightTable->setMinimumSize(COLUMN_WIDTH * 5, ROW_HEIGHT * 2);
-    lightTable->setDisabled(true);
+    lightLayout = new QGridLayout();
+    lightLayout->setSpacing(5);
 
-    lightButtonLayout = new QVBoxLayout();
-    lightButtonLayout->setContentsMargins(0,0,0,0);
-    lightTableLayout->addWidget(lightTable);
-    lightTableLayout->addLayout(lightButtonLayout);
+    lightLayout->addWidget(new QLabel("#"), 0, 0);
+    lightLayout->addWidget(new QLabel("Name"), 0, 1);
+    lightLayout->addWidget(new QLabel("Adress"), 0, 2);
+    lightLayout->addWidget(new QLabel("Position"), 0, 3);
+    lightLayout->addWidget(new QLabel("State"), 0, 4);
+    lightLayout->addWidget(new QLabel("Button"), 0, 5);
 
+    for (int i = 0; i < 6; i++)
+        lightLayout->setColumnMinimumWidth(i, COLUMN_WIDTH);
+    lightLayout->setRowMinimumHeight(0, ROW_HEIGHT);
+    lightLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+    lightLayout->setAlignment(Qt::AlignTop);
 
-    mainLayout->addLayout(lightTableLayout);
+    lightBox->setLayout(lightLayout);
+    mainLayout->addWidget(lightBox);
 }
 
 void Widget::initOptions()  {
@@ -96,30 +98,45 @@ void Widget::initOptions()  {
     mainLayout->addWidget(optionsBox);
 }
 
-void Widget::createButtons()    {
-    qDebug() << "creating buttons...";
+void Widget::createDeviceTable()    {
+    qDebug() << "refreshing device table...";
+
+    timer->stop();
+
     for (QPushButton *button : *lightButtons)   {
-        lightButtonLayout->removeWidget(button);
+        lightLayout->removeWidget(button);
+        delete button;
     }
     lightButtons->clear();
 
-    int i = 0;
+    int i = 1;
     for (Device& device : devices->getDevices())    {
+        for (int j = 0; j <= 5; j++)  {
+            lightLayout->removeWidget(dynamic_cast<QWidget*>(lightLayout->itemAtPosition(i, j)));
+        }
+
         device.setId(i);
         QString name = device.getName();
         QPushButton *button = new QPushButton("ON");
-        //button->setEnabled(false);
         lightButtons->insert(name, button);
-        //button->setGeometry(ITEM_MARGIN * 2 + COLUMN_WIDTH * 5, ROW_HEIGHT * (i++) + ITEM_MARGIN, COLUMN_WIDTH, ROW_HEIGHT);
-        button->move(ITEM_MARGIN * 2 + COLUMN_WIDTH * 5, ROW_HEIGHT * (i++) + ITEM_MARGIN);
 
         QString message = device.isEnabled() ? Client::MESSAGE_OFF : Client::MESSAGE_ON;
 
         connect(button, SIGNAL(clicked()), this, SLOT(slotSwitchButton()));
 
-        lightButtonLayout->addWidget(button);
+        lightLayout->addWidget(new QLabel(QString::number(i)), i, 0);
+        lightLayout->addWidget(new QLabel(device.getName()), i, 1);
+        lightLayout->addWidget(new QLabel(device.getAdress()), i, 2);
+        lightLayout->addWidget(new QLabel(QString::number(device.getPosition().X()) + " : " + QString::number(device.getPosition().Y())), i, 3);
+        lightLayout->addWidget(new QLabel(device.getPowerStateStr()), i, 4);
+        lightLayout->addWidget(button, i, 5);
+
+        i++;
     }
-    qDebug() << "Done.";
+
+    timer->start();
+
+    qDebug() << "Done. Buttons has been created.";
 }
 
 void Widget::setStatus(Status const& status)    {
@@ -144,39 +161,20 @@ void Widget::setStatus(Status const& status)    {
     }
 }
 
-void Widget::slotNewDevice(Device const& device)    {
-    lightTable->setRowCount(lightTable->rowCount() + 1);
-    lightTable->setRowHeight(lightTable->rowCount() - 1, ROW_HEIGHT);
-    lightTable->setItem(lightTable->rowCount() - 1, 0, new QTableWidgetItem(QString::number(lightTable->rowCount() - 1)));
-    lightTable->setItem(lightTable->rowCount() - 1, 1, new QTableWidgetItem(device.getName()));
-    lightTable->setItem(lightTable->rowCount() - 1, 2, new QTableWidgetItem(device.getAdress()));
-    lightTable->setItem(lightTable->rowCount() - 1, 3, new QTableWidgetItem(QString::number(device.getPosition().X()) + " : " + QString::number(device.getPosition().Y())));
-    lightTable->setItem(lightTable->rowCount() - 1, 4, new QTableWidgetItem(device.getPowerStateStr()));
-    //lightTable->resize(COLUMN_WIDTH * 5, ROW_HEIGHT * lightTable->rowCount());
-}
-
 void Widget::slotRefreshDevicesData()   {
-    int i = 1;
-    lightTable->setRowCount(devices->getDevices().size() + 1);
-
     for (Device &device : devices->getDevices())    {
-        lightTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
-        lightTable->setItem(i, 1, new QTableWidgetItem(device.getName()));
-        lightTable->setItem(i, 2, new QTableWidgetItem(device.getAdress()));
-        lightTable->setItem(i, 3, new QTableWidgetItem(QString::number(device.getPosition().X()) + " : " + QString::number(device.getPosition().Y())));
-        lightTable->setItem(i, 4, new QTableWidgetItem(device.getPowerStateStr()));
+        dynamic_cast<QLabel*>(lightLayout->itemAtPosition(device.getId(), 2)->widget())->setText(device.getAdress());
+        dynamic_cast<QLabel*>(lightLayout->itemAtPosition(device.getId(), 4)->widget())->setText(device.getPowerStateStr());
 
-        lightButtons->find(device.getName()).value()->setEnabled(device.isConnected());
-        lightButtons->find(device.getName()).value()->setText(device.isEnabled() ? "OFF" : "ON");
-
-        i++;
+        if (status != Status::CALLING)  {
+            lightButtons->find(device.getName()).value()->setEnabled(device.isConnected());
+            lightButtons->find(device.getName()).value()->setText(device.isEnabled() ? "OFF" : "ON");
+        }
     }
     if (client != nullptr && status == Status::CALLING)  {
-        /*  if (!client->isCalling() && !callDevicesButton->isEnabled())    {
-            callDevicesButton->setEnabled(true);
-            setStatus(Status::READY);
-        }   */
         recallProgressBar->setValue(client->getProgress());
+    }   else    {
+        recallProgressBar->setValue(0);
     }
 }
 
@@ -192,27 +190,31 @@ void Widget::initTimer()   {
 
 void Widget::destroyTimer() {
     qDebug() << "destroying GUI timer...";
-    timer->stop();
-    delete timer;
+    if (timer != nullptr)   {
+        timer->stop();
+        delete timer;
+    }
     qDebug() << "Done.";
 }
 
 void Widget::setClient(Client *client)  {
     this->client = client;
-    connect(this->client, SIGNAL(signalEndCalling()), this, SLOT(slotEndCalling()), Qt::ConnectionType::DirectConnection);
-    connect(this, SIGNAL(signalCancelCalling()), this->client, SLOT(slotCancelCalling()), Qt::ConnectionType::DirectConnection);
+    connect(this->client, SIGNAL(signalEndCalling()), this, SLOT(slotEndCalling()), Qt::ConnectionType::QueuedConnection);
+    connect(this, SIGNAL(signalCancelCalling()), this->client, SLOT(slotCancelCalling()), Qt::ConnectionType::QueuedConnection);
 }
 
 void Widget::setDevices(Devices *devices)   {
     this->devices = devices;
-
-    createButtons();
+    createDeviceTable();
 }
 
 void Widget::slotCallDevicesButton()    {
     QString adress = networkAdressBox->text();
+    if (adress.endsWith("1"))
+        adress.chop(1);
     if (!adress.endsWith('.'))
         adress.append('.');
+
     quint16 port = networkPortBox->text().toInt();
 
     if (Check::isCorrectAdress(adress) && port)    {
@@ -234,7 +236,6 @@ void Widget::slotCallDevicesButton()    {
     }
 }
 
-
 void Widget::slotCancelCallButton() {
     if (status == Status::CALLING) {
         qDebug() << "Calling was canceled by user.";
@@ -249,6 +250,7 @@ void Widget::slotEndCalling()   {
     setStatus(Status::READY);
     callDevicesButton->setEnabled(true);
     cancelCallButton->setEnabled(false);
+    client->getSocket()->moveToThread(QThread::currentThread());
 }
 
 void Widget::slotFileChooseButton() {
@@ -260,12 +262,12 @@ void Widget::slotFileChooseButton() {
     if (!Map::getMap().readMap(mapFile)) {
         QMessageBox::critical(this, "Error", "Map file not fount or it's incorrect.");
     }
-    createButtons();
+    createDeviceTable();
     setStatus(Status::READY);
 }
 
 void Widget::slotSwitchButton()   {
-    QPushButton *button = (QPushButton*) sender();
+    QPushButton *button = dynamic_cast<QPushButton*>(sender());
 
     QString name = lightButtons->key(button);
 
@@ -279,7 +281,6 @@ void Widget::slotSwitchButton()   {
     }   else    {
         message = Client::MESSAGE_ON;
     }
-    if (!client->sendToDevice(device, message)) {
+    if (!client->sendToDevice(device, message))
         QMessageBox::critical(this, "Error", "Lost connection to device " + name);
-    }
 }

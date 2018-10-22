@@ -10,13 +10,13 @@
 #include "device.h"
 #include "devices.h"
 #include "person.h"
-#include "persons.h"
 #include "point.h"
+#include "camera.h"
 
 /* Класс, описывающий карту, на которой расположены устройства освещения Device (и замки), а так же посетители и сотрудники, описываемые классом Person. Map при инстанциации получает карту
 Умного квартала из файла и, затем сохраняет её конфигурацию для отображения в GUI и хранит положение устройств освещения в lightDevices. */
 
-class Map : QObject
+class Map : public QObject
 {
     Q_OBJECT
 private:
@@ -34,13 +34,11 @@ private:
     QTimer *timer;
     static Client *client;
     static Devices *devices;
-
-    void initTimer();
-    void destroyTimer();
-    void checkPositions();
+    static QMap<QString, Camera> *cameras;
 
 public:
     static Map& getMap();
+    static Map* getMapPtr();
     float getWidth() const;
     float getHeight() const;
     void setWidth(float width);
@@ -52,7 +50,7 @@ public:
     bool readMap(QString fileName);
 
 public slots:
-    void slotCheckPositions();
+    void slotProcessData(QString data);
 };
 
 #endif // MAP_H

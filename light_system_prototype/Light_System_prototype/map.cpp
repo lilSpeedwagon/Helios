@@ -4,11 +4,13 @@
 Map* Map::map;
 Client* Map::client;
 Devices* Map::devices;
+QMap<QString, Camera>* Map::cameras;
 
 Map::Map()
 {
     qDebug() << "-----------------------------";
     qDebug() << "Map init...";
+    cameras = new QMap<QString, Camera>();
     readMap("C:\\docs\\programms\\Future Gadgets LAb\\Smart_district\\Helios\\light_system_prototype\\smartDistrict.lmap");
 }
 
@@ -16,6 +18,12 @@ Map& Map::getMap()  {
     if (!map)
         map = new Map();
     return *map;
+}
+
+Map* Map::getMapPtr()  {
+    if (!map)
+        map = new Map();
+    return map;
 }
 
 float Map::getWidth() const {
@@ -40,10 +48,17 @@ bool Map::readMap(QString fileName) {
     mapFile = new QFile(fileName);
     if (mapFile->exists() && mapFile->open(QIODevice::ReadOnly))   {
         qDebug() << "map file has opened.";
+
         if (devices != nullptr)
             devices->clear();
         else
             qWarning() << "No device list for map reader";
+
+        if (cameras != nullptr)
+            cameras->clear();
+        else
+            qWarning() << "No cameras list for map reader";
+
         qDebug() << "Reading...";
         if (mapFile->readLine().startsWith("<map>"))    {
             while (!mapFile->atEnd())    {
@@ -56,7 +71,19 @@ bool Map::readMap(QString fileName) {
 
                     devices->add(tempName, Device(tempName, Point(x, y)));
                 }
-                //здесь должно быть так же определение lock и геометрии карты
+                if (tempStr.startsWith("<camera"))   {
+                    QString tempName = tempStr.section("\'", 1, 1);
+                    float x = tempStr.section("\'", 3, 3).toFloat();
+                    float y = tempStr.section("\'", 5, 5).toFloat();
+                    QMap<QString, Device*> tempDevices;
+                    QString deviceStr = tempStr.section("\'", 7, 7);
+                    for (int i = 0; !tempStr.section(",", i,i).isEmpty(); i++) {
+                        tempDevices.insert(deviceStr.section(",", i,i), &(devices->getDevices().find(deviceStr.section(",", i,i)).value()));
+                    }
+                    qDebug() << "Camera with name = " << tempName << ", x = " << x << ", y = " << y << ", devices: " << tempDevices << " found";
+
+                    cameras->insert(tempName, Camera(tempName, tempDevices));
+                }
             }
             result = true;
         }   else    {
@@ -74,7 +101,8 @@ bool Map::readMap(QString fileName) {
 
 const float Map::TRIGGER_DISTANTION = 100;
 
-void Map::checkPositions() {
+//работало бы если бы мы получали инфо о координатах людей, но как то не задалось с этим........
+/*void Map::checkPositions() {
     qDebug() << "checking positions of all persons...";
     if (client != nullptr)   {
         for (auto &device : devices->getDevices())  {
@@ -99,41 +127,7 @@ void Map::checkPositions() {
         qDebug() << "No sender for this map.";
     }
 
-}
-
-void Map::initTimer()   {
-    qDebug() << "initializing map timer...";
-    timer = new QTimer();
-    timer->setInterval((int) 1000 / frequency);
-    connect(timer, SIGNAL(timeout()), this, SLOT(slotCheckPositions));
-    qDebug() << "Done";
-}
-
-void Map::destroyTimer()    {
-    qDebug() << "destroying map timer...";
-
-    timer->stop();
-    delete timer;
-
-    qDebug() << "Done.";
-}
-
-void Map::checkPositions(bool value)    {
-    if (timer == nullptr)  {
-        initTimer();
-    }
-    if (value)  {
-        qDebug() << "starting checking map every " << int(1000 / frequency) << " seconds...";
-        timer->start();
-    }   else    {
-        qDebug() << "Stopping checking map...";
-        timer->stop();
-    }
-}
-
-void Map::slotCheckPositions()  {
-    checkPositions();
-}
+}   */
 
 void Map::setSender(Client *newClient) {
     client = newClient;
@@ -141,4 +135,10 @@ void Map::setSender(Client *newClient) {
 
 void Map::setDevices(Devices *newDevices)  {
     devices = newDevices;
+}
+
+void Map::slotProcessData(QString data) {
+    qDebug() << "Processing data ...";
+
+    qDebug() << "Done.";
 }

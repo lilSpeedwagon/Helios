@@ -36,7 +36,7 @@ void Devices::clearAdresses()   {
             device.setAdress(0);
     }
 }
-QMap<QString, Device>& Devices::getDevices() const  {
+QMap<QString, Device>& Devices::getDevices()  {
     return *devices;
 }
 

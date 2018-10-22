@@ -35,7 +35,8 @@ SOURCES += \
     client.cpp \
     coder.cpp \
     requestmanager.cpp \
-    check.cpp
+    check.cpp \
+    camera.cpp
 
 HEADERS += \
         widget.h \
@@ -49,7 +50,8 @@ HEADERS += \
     client.h \
     coder.h \
     requestmanager.h \
-    check.h
+    check.h \
+    camera.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

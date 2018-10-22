@@ -16,7 +16,7 @@ public:
     void remove(QString name);
     void clear();
     void clearAdresses();
-    QMap<QString, Device>& getDevices() const;
+    QMap<QString, Device>& getDevices();
     int size() const;
 signals:
     void signalNewDevice();

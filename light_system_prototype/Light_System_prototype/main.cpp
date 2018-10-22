@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 
     w.setClient(client);
     w.setDevices(devices);
-    //client->callDevicesInThread();
 
     qDebug() << "Application has been initialized.";
     qDebug() << "-----------------------------";
@@ -45,8 +44,10 @@ int main(int argc, char *argv[])
             qDebug( "yet another address: %s", qPrintable( address.toString() ) ); // выводим на экран
     */
 
-    //RequestManager manager;
-    //manager.sendGETRequest("http://localhost/get_test/get_test.php", "?request=answer");
+    RequestManager manager;
+    manager.initTimer();
+    //manager.startTimer();
+    //manager.sendGETRequest(RequestManager::URL_VIDEO_SYSTEM);
 
     return a.exec();
 }
