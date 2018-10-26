@@ -54,6 +54,9 @@ void Widget::initOptions()  {
 
     optionsLayout = new QVBoxLayout();
 
+    currentNetworkAdressLabel = new QLabel("Current network: ");
+    optionsLayout->addWidget(currentNetworkAdressLabel, 1, Qt::AlignTop);
+
     networkAdressLabel = new QLabel("Network adress");
     optionsLayout->addWidget(networkAdressLabel, 1, Qt::AlignTop);
 
@@ -281,6 +284,8 @@ void Widget::slotSwitchButton()   {
     }   else    {
         message = Client::MESSAGE_ON;
     }
+    //double trying to send data
     if (!client->sendToDevice(device, message))
-        QMessageBox::critical(this, "Error", "Lost connection to device " + name);
+        if (!client->sendToDevice(device, message))
+            QMessageBox::critical(this, "Error", "Lost connection to device " + name);
 }

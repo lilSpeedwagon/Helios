@@ -30,6 +30,8 @@ public:
     void setFrequency(int freq);
     QString parseResponceStr(QString const& data);
 
+    static QString getNetworkAdress();
+
 public slots:
     void slotGetResponse(QNetworkReply *reply);
     void slotRequestForVideoData();

@@ -8,7 +8,7 @@ const int Client::ADRESS_MIN = 80;
 const int Client::ADRESS_MAX = 150;
 
 //public
-const quint16 Client::DELAY_CONNECTION = 50;
+const quint16 Client::DELAY_CONNECTION = 70;
 const quint16 Client::DELAY_READ_DATA = 1000;
 
 const QString Client::MESSAGE_CALL = "HI";

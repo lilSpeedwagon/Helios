@@ -57,6 +57,13 @@ QString RequestManager::parseResponceStr(QString const& data)   {
     return data;
 }
 
+
+QString RequestManager::getNetworkAdress()  {
+    QString networkName;
+
+    return networkName;
+}
+
 void RequestManager::slotRequestForVideoData()  {
     sendGETRequest(URL_VIDEO_SYSTEM, REQUEST_VIOEO_SYSTEM);
 }
@@ -75,4 +82,3 @@ QString makeGET(QString url, QString request)   {
 
     return GETStr;
 }
-

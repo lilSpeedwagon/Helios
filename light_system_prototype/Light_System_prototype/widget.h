@@ -54,6 +54,7 @@ private:
     QVBoxLayout* optionsLayout;
     QGroupBox* optionsBox;
 
+    QLabel* currentNetworkAdressLabel;
     QLabel* networkAdressLabel;
     QLineEdit* networkAdressBox;
 

@@ -6,7 +6,7 @@ const char RELAY2 = 6;
 const char RELAY3 = 7;
 //13 pin это диод на плате
 
-const char* HSERIAL = "H0005";
+const char* HSERIAL = "H0002";
 const char* ssid = "Quartal1";
 const char* pass = "SSQ2018sf";
 //const char* ssid = "AndroidAP";
@@ -181,6 +181,27 @@ void loop() {
         digitalWrite(RELAY1, HIGH);
         digitalWrite(RELAY2, HIGH);
         digitalWrite(RELAY3, HIGH);
+        delay(5);
+        digitalWrite(RELAY0, LOW);
+        digitalWrite(RELAY1, LOW);
+        digitalWrite(RELAY2, LOW);
+        digitalWrite(RELAY3, LOW);
+        delay(5);
+        digitalWrite(RELAY0, HIGH);
+        digitalWrite(RELAY1, HIGH);
+        digitalWrite(RELAY2, HIGH);
+        digitalWrite(RELAY3, HIGH);
+        delay(5);
+        digitalWrite(RELAY0, LOW);
+        digitalWrite(RELAY1, LOW);
+        digitalWrite(RELAY2, LOW);
+        digitalWrite(RELAY3, LOW);
+        delay(5);
+        digitalWrite(RELAY0, HIGH);
+        digitalWrite(RELAY1, HIGH);
+        digitalWrite(RELAY2, HIGH);
+        digitalWrite(RELAY3, HIGH);
+        delay(5);
         sendESP(inAdress, DONE);
       }
       else if (buff.equals("ON")) {
@@ -188,6 +209,27 @@ void loop() {
         digitalWrite(RELAY1, LOW);
         digitalWrite(RELAY2, LOW);
         digitalWrite(RELAY3, LOW);
+        delay(5);
+        digitalWrite(RELAY0, HIGH);
+        digitalWrite(RELAY1, HIGH);
+        digitalWrite(RELAY2, HIGH);
+        digitalWrite(RELAY3, HIGH);
+        delay(5);
+        digitalWrite(RELAY0, LOW);
+        digitalWrite(RELAY1, LOW);
+        digitalWrite(RELAY2, LOW);
+        digitalWrite(RELAY3, LOW);
+        delay(5);
+        digitalWrite(RELAY0, HIGH);
+        digitalWrite(RELAY1, HIGH);
+        digitalWrite(RELAY2, HIGH);
+        digitalWrite(RELAY3, HIGH);
+        delay(5);
+        digitalWrite(RELAY0, LOW);
+        digitalWrite(RELAY1, LOW);
+        digitalWrite(RELAY2, LOW);
+        digitalWrite(RELAY3, LOW);
+        
         sendESP(inAdress, DONE);
       }
       else if (buff.equals("OFF0")) {
