@@ -29,6 +29,7 @@ public:
     PowerState getPowerState() const;
     QString getPowerStateStr() const;
     Point getPosition() const;
+    QString getNetworkState() const;
 
     bool isEnabled() const;
     bool isConnected() const;

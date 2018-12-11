@@ -3,8 +3,7 @@
 
 #include "device.h"
 #include "devices.h"
-#include "point.h"
-#include "client.h"
+#include "callmanager.h"
 #include "map.h"
 #include "check.h"
 
@@ -14,6 +13,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
+#include <QScrollArea>
 #include <QLabel>
 #include <QPushButton>
 #include <QStatusBar>
@@ -24,6 +24,7 @@
 #include <QProgressBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QNetworkInterface>
 
 enum Status { INIT, CALLING, READY, MAP };
 
@@ -35,7 +36,7 @@ private:
     const int MIN_WIDTH = 900;
     const int MIN_HEIGHT = 300;
     const int ROW_HEIGHT = 30;
-    const int COLUMN_WIDTH = 100;
+    const int COLUMN_WIDTH = 80;
     const int ITEM_MARGIN = 10;
     const int MIN_OPTIONS_WIDTH = 200;
     const float REFRESH_FREQ = 5;
@@ -48,13 +49,13 @@ private:
     QHBoxLayout* mainLayout;
 
     QGroupBox* lightBox;
+    QScrollArea* lightScrollArea;
     QGridLayout* lightLayout;
     QMap<QString, QPushButton*> *lightButtons;
 
     QVBoxLayout* optionsLayout;
     QGroupBox* optionsBox;
 
-    QLabel* currentNetworkAdressLabel;
     QLabel* networkAdressLabel;
     QLineEdit* networkAdressBox;
 
@@ -63,8 +64,6 @@ private:
 
     QHBoxLayout* callLayout;
     QPushButton* callDevicesButton;
-    QPushButton* cancelCallButton;
-    QProgressBar* recallProgressBar;
     QPushButton* fileChooseButton;
 
     QLabel* statusBar;
@@ -76,12 +75,13 @@ private:
     void initTimer();
     void destroyTimer();
 
-    Client* client;
+    //Client* client;
+    CallManager* callManager;
     Devices* devices;
 
 public:
     Widget(QWidget *parent = 0);
-    void setClient(Client *client = nullptr);
+    void setCallManager(CallManager *callManager = nullptr);
     void setDevices(Devices *devices = nullptr);
     ~Widget() = default;
 
@@ -89,7 +89,6 @@ public slots:
     //void slotNewDevice(Device const& device);
     void slotRefreshDevicesData();
     void slotCallDevicesButton();
-    void slotCancelCallButton();
     void slotEndCalling();
     void slotFileChooseButton();
     void slotSwitchButton();

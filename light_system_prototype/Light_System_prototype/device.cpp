@@ -35,6 +35,13 @@ Point Device::getPosition() const   {
     return position;
 }
 
+QString Device::getNetworkState() const {
+    if (isConnected())  {
+        return "Connected";
+    }
+    return "Disconnected";
+}
+
 bool Device::isEnabled() const  {
     return (powerState == PowerState::ENABLED);
 }

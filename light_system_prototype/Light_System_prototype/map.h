@@ -32,9 +32,9 @@ private:
 
     QFile *mapFile;
     QTimer *timer;
-    static Client *client;
-    static Devices *devices;
-    static QMap<QString, Camera> *cameras;
+    Client *client;
+    Devices *devices;
+    QMap<QString, Camera> *cameras;
 
 public:
     static Map& getMap();
@@ -44,8 +44,8 @@ public:
     void setWidth(float width);
     void setHeight(float height);
     void checkPositions(bool value);
-    static void setSender(Client *client);
-    static void setDevices(Devices *devices);
+    void setSender(Client *client);
+    void setDevices(Devices *devices);
 
     bool readMap(QString fileName);
 

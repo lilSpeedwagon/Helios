@@ -6,8 +6,8 @@
 #include "person.h"
 #include "persons.h"
 #include "client.h"
+#include "callmanager.h"
 #include "map.h"
-#include "requestmanager.h"
 
 #include <QHostAddress>
 #include <QNetworkInterface>
@@ -23,31 +23,30 @@ int main(int argc, char *argv[])
     w.show();
 
     Devices *devices = new Devices();
-    Persons::getPersons();
 
-    Client *client = new Client(devices);
+    CallManager *callManager = new CallManager(devices);
 
-    Map::setDevices(devices);
-    Map::setSender(client);
-    Map::getMap();
+    Map::getMap().setDevices(devices);
+    Map::getMap().readMap("C:\\docs\\programms\\Future Gadgets LAb\\Smart_district\\Helios\\light_system_prototype\\smartDistrict.lmap");
+    //Map::setSender(callManager);
 
-    w.setClient(client);
+    w.setCallManager(callManager);
     w.setDevices(devices);
+
+    RequestManager manager;
 
     qDebug() << "Application has been initialized.";
     qDebug() << "-----------------------------";
 
-    /*
-    qDebug() << "adress list:";
-    QList<QHostAddress> addressList = QNetworkInterface::allAddresses();
-        foreach( QHostAddress address, addressList )
-            qDebug( "yet another address: %s", qPrintable( address.toString() ) ); // выводим на экран
-    */
 
-    RequestManager manager;
-    manager.initTimer();
-    //manager.startTimer();
-    //manager.sendGETRequest(RequestManager::URL_VIDEO_SYSTEM);
+    /* qDebug() << "adress list:";
+    QString currenthost;
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol && address !=QHostAddress(QHostAddress::LocalHost)) {
+            currenthost = address.toString();
+            qDebug() << currenthost << " is it yours wifi network???";
+        }
+    } */
 
     return a.exec();
 }

@@ -9,13 +9,19 @@
 #include <QTimer>
 #include "map.h"
 
+
+/*
+ *данный класс реализует мэнеджер отправки http запросов и передачи в связанные слоты get ответов
+ */
 class RequestManager : public QObject
 {
     Q_OBJECT
 private:
-    QNetworkAccessManager *manager;
     QTimer *timer;
     int frequency = 2;
+
+protected:
+    QNetworkAccessManager *manager;
 
 public:
     static const QString URL_VIDEO_SYSTEM;
@@ -33,7 +39,7 @@ public:
     static QString getNetworkAdress();
 
 public slots:
-    void slotGetResponse(QNetworkReply *reply);
+    virtual void slotGetResponse(QNetworkReply *reply);
     void slotRequestForVideoData();
 
 signals:

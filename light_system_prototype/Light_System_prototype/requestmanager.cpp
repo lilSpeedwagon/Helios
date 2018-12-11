@@ -6,13 +6,17 @@ const QString RequestManager::REQUEST_VIOEO_SYSTEM = "";
 
 RequestManager::RequestManager()
 {
+    qDebug() << "-----------------------------";
+    qDebug() << "Initializing request manager...";
     manager = new QNetworkAccessManager(this);
+    initTimer();
     connect(manager, SIGNAL(finished(QNetworkReply*)), SLOT(slotGetResponse(QNetworkReply*)));
     connect(this, SIGNAL(signalProcessData(QString)), Map::getMapPtr(), SLOT(slotProcessData(QString)));
+    qDebug() << "Done.";
 }
 
 void RequestManager::sendGETRequest(QString url, QString requestStr) {
-    qDebug() << "sending GET request to " << url;
+    qDebug() << "sending GET request " << url + requestStr;
     manager->get(QNetworkRequest(QUrl(url + requestStr)));
     //manager->get(QNetworkRequest(makeGET(url, requestStr)));
 }

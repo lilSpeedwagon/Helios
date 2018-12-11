@@ -14,6 +14,8 @@ Widget::Widget(QWidget *parent)
 
     lightButtons = new QMap<QString, QPushButton*>();
 
+    lightScrollArea = new QScrollArea(this);
+    mainLayout->addWidget(lightScrollArea);
     initLightTable();
     initOptions();
 
@@ -26,9 +28,7 @@ Widget::Widget(QWidget *parent)
 }
 
 void Widget::initLightTable()   {
-    lightBox = new QGroupBox("Device list");
-
-    lightLayout = new QGridLayout();
+    lightLayout = new QGridLayout(lightScrollArea);
     lightLayout->setSpacing(5);
 
     lightLayout->addWidget(new QLabel("#"), 0, 0);
@@ -37,15 +37,15 @@ void Widget::initLightTable()   {
     lightLayout->addWidget(new QLabel("Position"), 0, 3);
     lightLayout->addWidget(new QLabel("State"), 0, 4);
     lightLayout->addWidget(new QLabel("Button"), 0, 5);
+    lightLayout->addWidget(new QLabel("Network"), 0, 6);
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
         lightLayout->setColumnMinimumWidth(i, COLUMN_WIDTH);
     lightLayout->setRowMinimumHeight(0, ROW_HEIGHT);
     lightLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
     lightLayout->setAlignment(Qt::AlignTop);
 
-    lightBox->setLayout(lightLayout);
-    mainLayout->addWidget(lightBox);
+    lightScrollArea->setLayout(lightLayout);
 }
 
 void Widget::initOptions()  {
@@ -53,48 +53,30 @@ void Widget::initOptions()  {
     optionsBox->setMinimumWidth(MIN_OPTIONS_WIDTH);
 
     optionsLayout = new QVBoxLayout();
-
-    currentNetworkAdressLabel = new QLabel("Current network: ");
-    optionsLayout->addWidget(currentNetworkAdressLabel, 1, Qt::AlignTop);
+    optionsLayout->setAlignment(Qt::AlignTop);
 
     networkAdressLabel = new QLabel("Network adress");
+    networkAdressLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     optionsLayout->addWidget(networkAdressLabel, 1, Qt::AlignTop);
 
-    networkAdressBox = new QLineEdit(Client::ADRESS_MASK_DEFAULT);
+    //networkAdressBox = new QLineEdit(QNetworkInterface::allAddresses().first().toString());
+    networkAdressBox = new QLineEdit("");
     networkAdressBox->setPlaceholderText("Set yout network adress...");
+    networkAdressBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     optionsLayout->addWidget(networkAdressBox, 1, Qt::AlignTop);
 
-    networkPortLabel = new QLabel("Network port");
-    optionsLayout->addWidget(networkPortLabel, 1, Qt::AlignTop);
-
-    networkPortBox = new QLineEdit(QString::number(Client::PORT_DEFAULT));
-    networkPortBox->setPlaceholderText("Set yout network port...");
-    optionsLayout->addWidget(networkPortBox, 1, Qt::AlignTop);
-
-    callLayout = new QHBoxLayout();
-
     callDevicesButton = new QPushButton("Refresh Devices");
+    callDevicesButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(callDevicesButton, SIGNAL(clicked()), this, SLOT(slotCallDevicesButton()));
-    callLayout->addWidget(callDevicesButton, 1, Qt::AlignTop);
-
-    cancelCallButton = new QPushButton("Cancel");
-    connect(cancelCallButton, SIGNAL(clicked()), this, SLOT(slotCancelCallButton()));
-    cancelCallButton->setEnabled(false);
-    callLayout->addWidget(cancelCallButton, 1, Qt::AlignTop);
-
-    optionsLayout->addLayout(callLayout);
-
-    recallProgressBar = new QProgressBar();
-    recallProgressBar->setRange(0, 255);
-    recallProgressBar->setValue(0);
-    recallProgressBar->setEnabled(false);
-    optionsLayout->addWidget(recallProgressBar, 1, Qt::AlignTop);
+    optionsLayout->addWidget(callDevicesButton);
 
     fileChooseButton = new QPushButton("Map file...");
+    fileChooseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(fileChooseButton, SIGNAL(clicked()), this, SLOT(slotFileChooseButton()));
     optionsLayout->addWidget(fileChooseButton, 1, Qt::AlignTop);
 
     statusBar = new QLabel("Inititalizing...");
+    statusBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     optionsLayout->addWidget(statusBar, 1, Qt::AlignBottom);
 
     optionsBox->setLayout(optionsLayout);
@@ -106,33 +88,28 @@ void Widget::createDeviceTable()    {
 
     timer->stop();
 
-    for (QPushButton *button : *lightButtons)   {
-        lightLayout->removeWidget(button);
-        delete button;
-    }
+    for (int i = 0; i < lightButtons->size() * 7; i++)
+        delete lightLayout->takeAt(7)->widget();
     lightButtons->clear();
 
     int i = 1;
     for (Device& device : devices->getDevices())    {
-        for (int j = 0; j <= 5; j++)  {
-            lightLayout->removeWidget(dynamic_cast<QWidget*>(lightLayout->itemAtPosition(i, j)));
-        }
-
         device.setId(i);
         QString name = device.getName();
-        QPushButton *button = new QPushButton("ON");
+        QPushButton *button = new QPushButton("ON", lightLayout->widget());
         lightButtons->insert(name, button);
 
         QString message = device.isEnabled() ? Client::MESSAGE_OFF : Client::MESSAGE_ON;
 
         connect(button, SIGNAL(clicked()), this, SLOT(slotSwitchButton()));
 
-        lightLayout->addWidget(new QLabel(QString::number(i)), i, 0);
-        lightLayout->addWidget(new QLabel(device.getName()), i, 1);
-        lightLayout->addWidget(new QLabel(device.getAdress()), i, 2);
-        lightLayout->addWidget(new QLabel(QString::number(device.getPosition().X()) + " : " + QString::number(device.getPosition().Y())), i, 3);
-        lightLayout->addWidget(new QLabel(device.getPowerStateStr()), i, 4);
+        lightLayout->addWidget(new QLabel(QString::number(i), lightLayout->widget()), i, 0);
+        lightLayout->addWidget(new QLabel(device.getName(), lightLayout->widget()), i, 1);
+        lightLayout->addWidget(new QLabel(device.getAdress(), lightLayout->widget()), i, 2);
+        lightLayout->addWidget(new QLabel(QString::number(device.getPosition().X()) + " : " + QString::number(device.getPosition().Y()), lightLayout->widget()), i, 3);
+        lightLayout->addWidget(new QLabel(device.getPowerStateStr(), lightLayout->widget()), i, 4);
         lightLayout->addWidget(button, i, 5);
+        lightLayout->addWidget(new QLabel("Disconnected", lightLayout->widget()), i, 6);
 
         i++;
     }
@@ -168,16 +145,17 @@ void Widget::slotRefreshDevicesData()   {
     for (Device &device : devices->getDevices())    {
         dynamic_cast<QLabel*>(lightLayout->itemAtPosition(device.getId(), 2)->widget())->setText(device.getAdress());
         dynamic_cast<QLabel*>(lightLayout->itemAtPosition(device.getId(), 4)->widget())->setText(device.getPowerStateStr());
+        dynamic_cast<QLabel*>(lightLayout->itemAtPosition(device.getId(), 6)->widget())->setText(device.getNetworkState());
 
         if (status != Status::CALLING)  {
             lightButtons->find(device.getName()).value()->setEnabled(device.isConnected());
             lightButtons->find(device.getName()).value()->setText(device.isEnabled() ? "OFF" : "ON");
         }
-    }
-    if (client != nullptr && status == Status::CALLING)  {
-        recallProgressBar->setValue(client->getProgress());
-    }   else    {
-        recallProgressBar->setValue(0);
+
+        if (device.isConnected())   {
+            device.setAdress("");
+            callManager->checkConnected(device);
+        }
     }
 }
 
@@ -200,10 +178,9 @@ void Widget::destroyTimer() {
     qDebug() << "Done.";
 }
 
-void Widget::setClient(Client *client)  {
-    this->client = client;
-    connect(this->client, SIGNAL(signalEndCalling()), this, SLOT(slotEndCalling()), Qt::ConnectionType::QueuedConnection);
-    connect(this, SIGNAL(signalCancelCalling()), this->client, SLOT(slotCancelCalling()), Qt::ConnectionType::QueuedConnection);
+void Widget::setCallManager(CallManager *callManager)  {
+    this->callManager = callManager;
+    connect(this->callManager, SIGNAL(signalEndCalling()), this, SLOT(slotEndCalling()), Qt::ConnectionType::QueuedConnection);
 }
 
 void Widget::setDevices(Devices *devices)   {
@@ -218,18 +195,15 @@ void Widget::slotCallDevicesButton()    {
     if (!adress.endsWith('.'))
         adress.append('.');
 
-    quint16 port = networkPortBox->text().toInt();
-
-    if (Check::isCorrectAdress(adress) && port)    {
-        if (client != nullptr)  {
+    if (Check::isCorrectAdress(adress))    {
+        if (callManager != nullptr)  {
             setStatus(Status::CALLING);
             callDevicesButton->setEnabled(false);
-            cancelCallButton->setEnabled(true);
 
-            client->setAdress(adress, port);
+            callManager->setAdress(adress);
             devices->clearAdresses();
             //client->callDevicesInThread();
-            client->callDevices();
+            callManager->callDevices();
         }   else    {
             qDebug() << "Trying to recall devices, but client isn't set for this widget.";
         }
@@ -239,21 +213,10 @@ void Widget::slotCallDevicesButton()    {
     }
 }
 
-void Widget::slotCancelCallButton() {
-    if (status == Status::CALLING) {
-        qDebug() << "Calling was canceled by user.";
-        emit signalCancelCalling();
-        cancelCallButton->setEnabled(false);
-        setStatus(Status::READY);
-    }
-}
-
 void Widget::slotEndCalling()   {
     qDebug() << "end calling slot";
     setStatus(Status::READY);
     callDevicesButton->setEnabled(true);
-    cancelCallButton->setEnabled(false);
-    client->getSocket()->moveToThread(QThread::currentThread());
 }
 
 void Widget::slotFileChooseButton() {
@@ -280,12 +243,9 @@ void Widget::slotSwitchButton()   {
 
     QString message;
     if (device.getPowerState() == PowerState::ENABLED) {
-        message = Client::MESSAGE_OFF;
+        message = CallManager::REQUEST_OFF;
     }   else    {
-        message = Client::MESSAGE_ON;
+        message = CallManager::REQUEST_ON;
     }
-    //double trying to send data
-    if (!client->sendToDevice(device, message))
-        if (!client->sendToDevice(device, message))
-            QMessageBox::critical(this, "Error", "Lost connection to device " + name);
+    callManager->sendToDevice(device, message);
 }

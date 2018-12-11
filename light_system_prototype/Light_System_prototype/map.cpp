@@ -2,16 +2,12 @@
 
 //статический член класса, согласно стандарту, должен быть определен где то вне класса
 Map* Map::map;
-Client* Map::client;
-Devices* Map::devices;
-QMap<QString, Camera>* Map::cameras;
 
 Map::Map()
 {
     qDebug() << "-----------------------------";
     qDebug() << "Map init...";
     cameras = new QMap<QString, Camera>();
-    readMap("C:\\docs\\programms\\Future Gadgets LAb\\Smart_district\\Helios\\light_system_prototype\\smartDistrict.lmap");
 }
 
 Map& Map::getMap()  {
@@ -93,6 +89,7 @@ bool Map::readMap(QString fileName) {
         mapFile->close();
 
         qDebug() << "Done. Map file has been successfuly red.";
+        qDebug() << devices->size() << " devices and " << cameras->size() << " cameras founded";
     }   else    {
         qCritical() << "map file not found or it's incorrect :(";
     }

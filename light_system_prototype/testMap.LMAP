@@ -1,4 +1,14 @@
 <map>
 <light name='test_light1' x='100' y='100'>
 <light name='test_light2' x='200' y='200'>
+<light name='test_light3' x='200' y='200'>
+<light name='test_light4' x='200' y='200'>
+<light name='test_light5' x='200' y='200'>
+<light name='test_light6' x='200' y='200'>
+<light name='test_light7' x='200' y='200'>
+<light name='test_light8' x='200' y='200'>
+<light name='test_light9' x='200' y='200'>
+<light name='test_light10' x='200' y='200'>
+<light name='test_light11' x='200' y='200'>
+<light name='test_light12' x='200' y='200'>
 </map>
